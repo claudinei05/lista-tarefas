@@ -1,36 +1,50 @@
 "use client";
 
-import { Container, Typography, TextField, Button, Card, CardContent, Grid } from "@mui/material";
-import { log } from "console";
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+} from "@mui/material";
 import { useState } from "react";
 
-
 export default function CriarContaPage() {
-  const [nome, setNome] =useState('')
-  const [email, setEmail] =useState('')
-  const [senha, setSenha] =useState('')
-  const [cSenha, setCSenha] =useState('')
- 
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [cSenha, setCSenha] = useState("");
+  const [error, setError] = useState("");
 
-  
-  
-  const handleClick = ()=>{
-    if(nome.trim() && email.trim() && senha.trim() && cSenha.trim()){
-
-      const salvarObjeto ={
-        nome : nome,
-        email: email,
-        senha: senha,
-      }
-      console.log(salvarObjeto);
-      
-      setNome(''),
-      setEmail(''),
-      setSenha(''),
-      setCSenha('')
+  const handleClick = () => {
+    if (!nome.trim() || !email.trim() || !senha.trim() || !cSenha.trim()) {
+      setError("Preencha todos os campos.");
+      return;
     }
-  }
 
+    if (senha !== cSenha) {
+      setError("As senhas não coincidem.");
+      return;
+    }
+    const objetoCriarConta = {
+      nome: nome,
+      email: email,
+      senha: senha,
+      cSenha: cSenha,
+    };
+    // Recupera usuários já cadastrados ou cria um array vazio
+    const usuariosSalvos = JSON.parse(
+      localStorage.getItem("salvarUsuario") || "[]"
+    );
+    // Adiciona o novo usuário
+    usuariosSalvos.push(objetoCriarConta);
+    // Armazenando o objeto no localStorage
+    localStorage.setItem("salvarUsuario", JSON.stringify(usuariosSalvos));
+
+    setNome(""), setEmail(""), setSenha(""), setCSenha("");
+  };
 
   return (
     <Container maxWidth="sm" sx={{ mt: 6 }}>
@@ -39,6 +53,16 @@ export default function CriarContaPage() {
           <Typography variant="h5" component="h1" gutterBottom align="center">
             Criar Conta{nome}
           </Typography>
+          {error && (
+            <Typography
+              variant="body2"
+              color="error"
+              align="center"
+              gutterBottom
+            >
+              {error}
+            </Typography>
+          )}
 
           <Grid container spacing={2}>
             {/* Nome */}
@@ -50,7 +74,6 @@ export default function CriarContaPage() {
                 onChange={(e) => setNome(e.target.value)}
                 variant="outlined"
               />
-              
             </Grid>
 
             {/* E-mail */}
